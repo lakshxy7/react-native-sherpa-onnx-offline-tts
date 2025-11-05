@@ -18,24 +18,34 @@ const generateAndPlay = async (text: any, sid: any, speed: any) => {
   }
 };
 
+// NEW: returns absolute path to the generated WAV.
+// options: { isSaving?: number|boolean, fileName?: string }
+const generate = async (text: any, sid: any, speed: any, options: any = {}) => {
+  try {
+    const path = await TTSManager.generate(text, sid, speed, options);
+    return path; // e.g., /data/user/0/<pkg>/files/Music/your_name.wav
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
 const deinitialize = () => {
   TTSManager.deinitialize();
 };
 
 const addVolumeListener = (callback: any) => {
-  const subscription = ttsManagerEmitter.addListener(
-    'VolumeUpdate',
-    (event) => {
-      const { volume } = event;
-      callback(volume);
-    }
-  );
+  const subscription = ttsManagerEmitter.addListener('VolumeUpdate', (event) => {
+    const { volume } = event;
+    callback(volume);
+  });
   return subscription;
 };
 
 export default {
   initialize,
   generateAndPlay,
+  generate,          // <-- exposed
   deinitialize,
   addVolumeListener,
 };
